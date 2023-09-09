@@ -2,7 +2,16 @@
   "name": "speedscope",
   "displayName": "speedscope",
   "description": "VS Code extension for speedscope app",
+  "author": "evg656e <evg656e@gmail.com>",
+  "license": "UNLICENSED",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/evg656e/vscode-speedscope.git"
+  },
+  "bugs": {
+      "url": "https://github.com/evg656e/vscode-speedscope/issues"
+  },
   "engines": {
     "vscode": "^1.82.0"
   },
