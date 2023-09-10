@@ -1,26 +1,48 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as path from 'path';
+import * as fs from 'fs';
+import { escapeRegExp } from 'lodash';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+const speedscopeViewType = 'speedscope';
+
+const speedscopeWebRoot = 'media/speedscope';
+
+const speedscopeResources = [
+    'speedscope.f27db165.js',
+    'reset.8c46b7a1.css',
+];
+
 export function activate(context: vscode.ExtensionContext) {
+    console.log('Extension "speedscope" is now active!');
 
-    // Use the console to output diagnostic information (console.log) and errors (console.error)
-    // This line of code will only be executed once when your extension is activated
-    console.log('Congratulations, your extension "speedscope" is now active!');
+    const disposable = vscode.commands.registerCommand('speedscope.showSpeedscope', () => {
+        const panel = vscode.window.createWebviewPanel(speedscopeViewType, 'Speedscope', vscode.ViewColumn.Beside, {
+            enableScripts: true
+        });
 
-    // The command has been defined in the package.json file
-    // Now provide the implementation of the command with registerCommand
-    // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand('speedscope.helloWorld', () => {
-        // The code you place here will be executed every time your command is executed
-        // Display a message box to the user
-        vscode.window.showInformationMessage('Hello World from speedscope!');
+        panel.webview.html = patchSpeedscopeResources(context, panel, getSpeedscopeHTML(context));
     });
 
     context.subscriptions.push(disposable);
 }
 
-// This method is called when your extension is deactivated
-export function deactivate() {}
+function fileUri(...paths: string[]): vscode.Uri {
+    return vscode.Uri.file(path.join(...paths));
+}
+
+function patchSpeedscopeResources(context: vscode.ExtensionContext, panel: vscode.WebviewPanel, speedscopeHTML: string) {
+    const resPattern = speedscopeResources.map(resource => escapeRegExp(resource)).join('|');
+    const resRegex = new RegExp(resPattern, 'g');
+
+    return speedscopeHTML.replace(resRegex, (res) => {
+        const resUri = fileUri(context.extensionPath, speedscopeWebRoot, res);
+        return panel.webview.asWebviewUri(resUri).toString();
+    });
+}
+
+function getSpeedscopeHTML(context: vscode.ExtensionContext) {
+    const onDiskPath = fileUri(context.extensionPath, speedscopeWebRoot, 'index.html');
+    return fs.readFileSync(onDiskPath.fsPath, 'utf8');
+}
+
+export function deactivate() { }

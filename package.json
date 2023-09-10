@@ -23,8 +23,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "speedscope.helloWorld",
-        "title": "Hello World"
+        "command": "speedscope.showSpeedscope",
+        "title": "Show speedscope"
       }
     ]
   },
@@ -38,12 +38,14 @@
   },
   "devDependencies": {
     "@types/vscode": "^1.82.0",
+    "@types/lodash": "^4.14.198",
     "@types/mocha": "^10.0.1",
     "@types/node": "16.x",
     "@typescript-eslint/eslint-plugin": "^6.4.1",
     "@typescript-eslint/parser": "^6.4.1",
     "eslint": "^8.47.0",
     "glob": "^10.3.3",
+    "lodash": "^4.17.21",
     "mocha": "^10.2.0",
     "typescript": "^5.1.6",
     "@vscode/test-electron": "^2.3.4"

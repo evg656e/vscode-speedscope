@@ -1,3 +1,3 @@
-- [ ] Show speedscope in side view
+- [x] Show speedscope in side view
 - [ ] Jump to file:line from speedscope view into VS Code editor
 - [ ] Open file in speedscope
