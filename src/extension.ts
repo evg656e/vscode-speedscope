@@ -59,16 +59,14 @@ function getSpeedscopeHTML(context: vscode.ExtensionContext) {
 
 async function jumpTo(file: string, line: number, col: number) {
     try {
-        const document = await vscode.workspace.openTextDocument(file);
-        const editor = await vscode.window.showTextDocument(document, vscode.ViewColumn.One);
-
         // convert to 0-based
         line = Math.max(0, line - 1);
         col = Math.max(0, col - 1);
 
-        const position = new vscode.Position(line, col);
-        editor.selection = new vscode.Selection(position, position);
-        editor.revealRange(new vscode.Range(position, position));
+        await vscode.window.showTextDocument(vscode.Uri.file(file), {
+            viewColumn: vscode.ViewColumn.One,
+            selection: new vscode.Selection(line, col, line, col)
+        });
     }
     catch (e) {
         vscode.window.showErrorMessage(`Failed to open file ${file}: ${e}`);
