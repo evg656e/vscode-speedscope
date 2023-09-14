@@ -1,4 +1,8 @@
 - [x] Show speedscope in side view
 - [x] Jump to file:line from speedscope view into VS Code editor
-- [ ] Open file in speedscope
-- [ ] TBD: add convert to 0-based line numbers setting
+- [x] Open file in speedscope
+- [ ] Update README.md
+- [ ] TBD: add settings
+  - [ ] convert to 0-based line numbers
+  - [ ] view column
+  - [ ] supported extensions

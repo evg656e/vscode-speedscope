@@ -8,21 +8,21 @@ const speedscopeViewType = 'speedscope';
 const speedscopeWebRoot = 'media/speedscope';
 
 const speedscopeResources = [
-    'speedscope.179feffa.js',
+    'speedscope.e9450fa6.js',
     'reset.4d8f9039.css',
 ];
 
-export function activate(context: vscode.ExtensionContext) {
-    console.log('Extension "speedscope" is now active!');
+let speedscopePanel: vscode.WebviewPanel | undefined = undefined;
 
-    const disposable = vscode.commands.registerCommand('speedscope.showSpeedscope', () => {
-        const panel = vscode.window.createWebviewPanel(speedscopeViewType, 'Speedscope', vscode.ViewColumn.Beside, {
+function showSpeedscopePanel(context: vscode.ExtensionContext) {
+    if (!speedscopePanel) {
+        speedscopePanel = vscode.window.createWebviewPanel(speedscopeViewType, 'Speedscope', vscode.ViewColumn.Beside, {
             enableScripts: true
         });
 
-        panel.webview.html = patchSpeedscopeResources(context, panel, getSpeedscopeHTML(context));
+        speedscopePanel.webview.html = patchSpeedscopeResources(context, speedscopePanel, getSpeedscopeHTML(context));
 
-        panel.webview.onDidReceiveMessage(
+        speedscopePanel.webview.onDidReceiveMessage(
             async message => {
                 switch (message.command) {
                     case 'jumpTo':
@@ -33,9 +33,44 @@ export function activate(context: vscode.ExtensionContext) {
             undefined,
             context.subscriptions
         );
-    });
 
-    context.subscriptions.push(disposable);
+        speedscopePanel.onDidDispose(
+            () => {
+                speedscopePanel = undefined;
+            },
+            undefined,
+            context.subscriptions
+        );
+    }
+    else {
+        speedscopePanel.reveal();
+    }
+
+    return speedscopePanel;
+}
+
+export function activate(context: vscode.ExtensionContext) {
+    console.log('Extension "speedscope" is now active!');
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('speedscope.show', () => {
+            showSpeedscopePanel(context);
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('speedscope.open', async (uri: vscode.Uri) => {
+            if (!uri) {
+                return;
+            }
+
+            const panel = showSpeedscopePanel(context);
+            panel.webview.postMessage({
+                command: 'open',
+                uri: panel.webview.asWebviewUri(uri).toString()
+            });
+        })
+    );
 }
 
 function fileUri(...paths: string[]): vscode.Uri {
