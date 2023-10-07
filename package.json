@@ -1,16 +1,19 @@
 {
   "name": "speedscope",
   "displayName": "speedscope",
-  "description": "VS Code extension for speedscope app",
+  "description": "VS Code extension for Speedscope app",
   "author": "evg656e <evg656e@gmail.com>",
   "license": "UNLICENSED",
-  "version": "0.0.1",
+  "publisher": "evg656e",
+  "version": "1.0.0",
+  "homepage": "https://github.com/evg656e/vscode-speedscope/blob/main/README.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/evg656e/vscode-speedscope.git"
   },
   "bugs": {
-    "url": "https://github.com/evg656e/vscode-speedscope/issues"
+    "url": "https://github.com/evg656e/vscode-speedscope/issues",
+    "email": "evg656e@gmail.com"
   },
   "engines": {
     "vscode": "^1.82.0"
@@ -18,6 +21,8 @@
   "categories": [
     "Other"
   ],
+  "icon": "media/icon.png",
+  "pricing": "Free",
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
@@ -50,17 +55,15 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@types/vscode": "^1.82.0",
-    "@types/lodash": "^4.14.198",
     "@types/mocha": "^10.0.1",
     "@types/node": "16.x",
+    "@types/vscode": "^1.82.0",
     "@typescript-eslint/eslint-plugin": "^6.4.1",
     "@typescript-eslint/parser": "^6.4.1",
+    "@vscode/test-electron": "^2.3.4",
     "eslint": "^8.47.0",
     "glob": "^10.3.3",
-    "lodash": "^4.17.21",
     "mocha": "^10.2.0",
-    "typescript": "^5.1.6",
-    "@vscode/test-electron": "^2.3.4"
+    "typescript": "^5.1.6"
   }
 }

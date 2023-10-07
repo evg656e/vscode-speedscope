@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { escapeRegExp } from 'lodash';
 
 const speedscopeViewType = 'speedscope';
 
@@ -49,28 +48,32 @@ function showSpeedscopePanel(context: vscode.ExtensionContext) {
     return speedscopePanel;
 }
 
-export function activate(context: vscode.ExtensionContext) {
-    console.log('Extension "speedscope" is now active!');
+function getOpenCommandUri(args: any[]) {
+    if (args.length === 0) {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            return;
+        }
+        return editor.document.uri;
+    }
 
-    context.subscriptions.push(
-        vscode.commands.registerCommand('speedscope.show', () => {
-            showSpeedscopePanel(context);
-        })
-    );
+    const arg0 = args[0];
+    if (arg0 instanceof vscode.Uri) {
+        return arg0;
+    }
 
-    context.subscriptions.push(
-        vscode.commands.registerCommand('speedscope.open', async (uri: vscode.Uri) => {
-            if (!uri) {
-                return;
-            }
+    if (Array.isArray(arg0) && arg0.length === 2 && typeof arg0[0] === 'string' && typeof arg0[1] === 'string') { // open from tasks.json
+        const workspacePath = arg0[1];
+        return fileUri(workspacePath, 'profile.json'); // hard-coded default profile name, is it possible to get args from tasks.json somehow?
+    }
+}
 
-            const panel = showSpeedscopePanel(context);
-            panel.webview.postMessage({
-                command: 'open',
-                uri: panel.webview.asWebviewUri(uri).toString()
-            });
-        })
-    );
+function openInSpeedscope(context: vscode.ExtensionContext, uri: vscode.Uri) {
+    const panel = showSpeedscopePanel(context);
+    panel.webview.postMessage({
+        command: 'open',
+        uri: panel.webview.asWebviewUri(uri).toString()
+    });
 }
 
 function fileUri(...paths: string[]): vscode.Uri {
@@ -85,6 +88,16 @@ function patchSpeedscopeResources(context: vscode.ExtensionContext, panel: vscod
         const resUri = fileUri(context.extensionPath, speedscopeWebRoot, res);
         return panel.webview.asWebviewUri(resUri).toString();
     });
+}
+
+// copy/pasted from https://github.com/lodash/lodash/blob/4.17.15/lodash.js#L14273, because using lodash with TypeScript still a PITA in 2023
+const reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
+const reHasRegExpChar = RegExp(reRegExpChar.source);
+
+function escapeRegExp(str: string) {
+    return (str && reHasRegExpChar.test(str))
+        ? str.replace(reRegExpChar, '\\$&')
+        : str;
 }
 
 function getSpeedscopeHTML(context: vscode.ExtensionContext) {
@@ -106,6 +119,26 @@ async function jumpTo(file: string, line: number, col: number) {
     catch (e) {
         vscode.window.showErrorMessage(`Failed to open file ${file}: ${e}`);
     }
+}
+
+export function activate(context: vscode.ExtensionContext) {
+    console.log('Speedscope extension is activated.');
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('speedscope.show', () => {
+            showSpeedscopePanel(context);
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('speedscope.open', async (...args: any[]) => {
+            const uri = getOpenCommandUri(args);
+            if (!uri) {
+                return;
+            }
+            openInSpeedscope(context, uri);
+        })
+    );
 }
 
 export function deactivate() { }

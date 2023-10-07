@@ -1,71 +1,61 @@
-# speedscope README
+# Speedscope VS Code Extension
 
-This is the README for your extension "speedscope". After writing up a brief description, we recommend including the following sections.
+Open [🔬Speedscope](https://www.speedscope.app/) profiles in VS Code and jump to the source code of the profiled functions.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+### Open a speedscope profiles from VS Code Explorer
 
-For example if there is an image subfolder under your extension project workspace:
+![Open a speedscope profile](https://github.com/evg656e/vscode-speedscope/assets/28028005/f9fe083f-b497-4e42-8f47-217b195ab347)
 
-\!\[feature X\]\(images/feature-x.png\)
+Menu item available for `.json`, `.txt`, `.log`, `.prof`, `.cpuprofile` and `.heapprofile` extensions.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+### Jump to the source code of the profiled functions
 
-## Requirements
+![Jump to the source code](https://github.com/evg656e/vscode-speedscope/assets/28028005/e4475bd2-8e1c-4c81-97c9-0c529488ba4c)
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Use `Crtl+Click` on the function name in the flamegraph to jump to the source code.
 
-## Extension Settings
+### Show speedscope app in side view with ability to open local files
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+![Show speedscope in side view](https://github.com/evg656e/vscode-speedscope/assets/28028005/2eb0cac0-33c8-411a-8835-cf34e475a66f)
 
-For example:
+Use `Ctrl+Shift+P` and type `Show Speedscope` to open speedscope in side view.
 
-This extension contributes the following settings:
+## Usage examples
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+### Profiling with py-spy
 
-## Known Issues
+Here is example of profiling automation with [py-spy](https://github.com/benfred/py-spy). Add following lines to your `tasks.json` file:
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+```json
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Profile isort",
+            "type": "process",
+            "command": "${env:LOCALAPPDATA}/Programs/Python/Python311/Scripts/py-spy.exe", // correct path for your system
+            "args": [
+                // py-spy arguments
+                "record",
+                "--output", "${workspaceFolder}/profile.json",
+                "--format", "speedscope",
+                // profiled app arguments (isort)
+                "--",
+                "${workspaceFolder}/.venv/Scripts/python.exe", // venv for profiled app (setup needed)
+                "${workspaceFolder}/isort",
+                "--diff",
+                "--check",
+                "--verbose",
+                "C:/Projects/django/django", // running isort on django repo to collect profile samples
+            ],
+            "problemMatcher": []
+        },
+    ]
+}
+```
 
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Now you can run this task and open the profile in VS Code speedscope view with ability to jump to the source code of the profiled functions.
